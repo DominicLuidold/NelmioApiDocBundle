@@ -1,0 +1,44 @@
+name: GitHub PR Lint
+
+on:
+  pull_request: # TODO - Change to 'pull_request_target'
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+
+jobs:
+  lint-pr:
+    name: Validate PR title
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Lint title
+        uses: amannn/action-semantic-pull-request@v5
+        id: lint_pr_title
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create lint failure comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: always() && (steps.lint_pr_title.outputs.error_message != null)
+        with:
+          header: pr-title-lint-error
+          message: |
+            Hey there and thank you for opening this pull request! :wave:
+            
+            We require pull request titles to follow the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/) and it looks like your proposed title needs to be adjusted.
+            
+            Details:
+            
+            ```
+            ${{ steps.lint_pr_title.outputs.error_message }}
+            ```
+
+      - name: Remove lint failure comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ steps.lint_pr_title.outputs.error_message == null }}
+        with:
+          header: pr-title-lint-error
+          delete: true
