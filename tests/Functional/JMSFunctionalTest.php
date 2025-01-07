@@ -461,6 +461,19 @@ class JMSFunctionalTest extends WebTestCase
         ], json_decode($this->getModel('JMSAbstractUser')->toJson(), true));
     }
 
+    public function testIgnoredProperty(): void
+    {
+        self::assertEquals([
+            'schema' => 'JMSIgnoredProperty',
+            'type' => 'object',
+            'properties' => [
+                'regular_property' => [
+                    'type' => 'string',
+                ],
+            ],
+        ], json_decode($this->getModel('JMSIgnoredProperty')->toJson(), true));
+    }
+
     /**
      * @param array<mixed> $options
      */
